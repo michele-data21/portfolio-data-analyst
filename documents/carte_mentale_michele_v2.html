@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte Mentale Portfolio — Michèle</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f8f8f6;font-family:Arial,sans-serif}
+.wrap{width:100%;overflow-x:auto;padding:8px 0 16px}
+/* Canvas large : projets sur 4 colonnes à gauche, centre et branches à droite */
+.canvas{position:relative;width:1800px;min-height:1000px;margin:0 auto}
+
+.node-center{
+  position:absolute;left:950px;top:500px;transform:translate(-50%,-50%);
+  width:160px;height:80px;border-radius:16px;
+  background:#fff;border:2px solid #888;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;z-index:20;padding:8px;
+}
+.node-center .name{font-size:13px;font-weight:600;color:#222}
+.node-center .role{font-size:10px;color:#666;margin-top:2px}
+
+.branch{
+  position:absolute;border-radius:10px;padding:6px 10px;z-index:12;
+  font-size:11px;font-weight:600;text-align:center;cursor:pointer;
+  border:1.5px solid;transition:transform .15s,opacity .15s;
+}
+.branch:hover{transform:scale(1.05);opacity:.85}
+
+.proj{
+  position:absolute;border-radius:8px;padding:5px 9px;z-index:11;
+  font-size:10px;font-weight:600;cursor:pointer;border:1px solid;
+  transition:transform .12s;
+}
+.proj:hover{transform:scale(1.04)}
+.proj .num{font-size:9px;margin-bottom:1px;opacity:.75}
+.proj .ttl{font-size:10px;font-weight:600;width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.leaf{
+  position:absolute;border-radius:5px;padding:3px 7px;z-index:10;
+  font-size:9px;border:.5px solid;cursor:pointer;white-space:nowrap;
+  text-decoration:none;display:block;
+}
+a.leaf:hover{text-decoration:underline;opacity:.85}
+
+.c-blue  {background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.c-teal  {background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.c-purple{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.c-amber {background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.c-coral {background:#FAECE7;border-color:#F0997B;color:#4A1B0C}
+.c-pink  {background:#FBEAF0;border-color:#ED93B1;color:#4B1528}
+.c-green {background:#EAF3DE;border-color:#97C459;color:#173404}
+.c-gray  {background:#F1EFE8;border-color:#B4B2A9;color:#2C2C2A}
+
+.c-blue-dark  {background:#0C447C;border-color:#0C447C;color:#E6F1FB}
+.c-teal-dark  {background:#085041;border-color:#085041;color:#E1F5EE}
+.c-purple-dark{background:#3C3489;border-color:#3C3489;color:#EEEDFE}
+.c-amber-dark {background:#633806;border-color:#633806;color:#FAEEDA}
+.c-green-dark {background:#173404;border-color:#3B6D11;color:#EAF3DE}
+.c-pink-dark  {background:#4B1528;border-color:#993556;color:#FBEAF0}
+.c-amber-dark {background:#633806;border-color:#633806;color:#FAEEDA}
+
+#detail{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#fff;border:1px solid #ccc;border-radius:12px;
+  padding:14px 20px;max-width:500px;width:90%;z-index:100;display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);
+}
+#detail .dt-title{font-size:13px;font-weight:600;color:#222;margin-bottom:6px}
+#detail .dt-body{font-size:12px;color:#555;line-height:1.5}
+#detail .dt-close{position:absolute;top:10px;right:14px;font-size:18px;cursor:pointer;color:#999;line-height:1}
+#detail .dt-tag{display:inline-block;font-size:9px;padding:2px 6px;border-radius:4px;margin:2px 2px 0 0}
+.tag-v{background:#D4EDDA;color:#155724}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="canvas" id="map">
+
+<svg style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none" xmlns="http://www.w3.org/2000/svg" id="svg-lines"></svg>
+
+<!-- CENTER NODE -->
+<div class="node-center" id="nc">
+  <div class="name">Michèle</div>
+  <div class="role">Portfolio Data Analyst</div>
+  <div class="role">OpenClassrooms · 12 Projets</div>
+</div>
+
+<!-- ===== BRANCHES droite ===== -->
+<div class="branch c-blue-dark"   id="b-profil"  style="left:660px;top:200px;width:130px">Profil &amp; Vision</div>
+<div class="branch c-purple-dark" id="b-comp"    style="left:1050px;top:185px;width:140px">Compétences</div>
+<div class="branch c-teal-dark"   id="b-veille"  style="left:1260px;top:275px;width:130px">Veille métier</div>
+<div class="branch c-pink-dark"   id="b-soft"    style="left:1260px;top:545px;width:130px">Soft skills</div>
+<div class="branch c-amber-dark"  id="b-gestion" style="left:1050px;top:695px;width:160px">Gestion portfolio</div>
+<div class="branch c-green-dark"  id="b-projets" style="left:600px;top:655px;width:120px">12 Projets</div>
+
+
+
+<!-- COMPÉTENCES LEAVES -->
+<div class="leaf c-purple" style="left:1210px;top:155px">Python · SQL · Power BI · DBT · R · Excel</div>
+<div class="leaf c-purple" style="left:1210px;top:178px">Machine Learning supervisé &amp; non supervisé</div>
+<div class="leaf c-purple" style="left:1210px;top:201px">Visualisation · Storytelling · RGPD</div>
+<div class="leaf c-purple" style="left:1210px;top:224px">Axe progrès : ACP · Délais · Gestion du temps</div>
+
+<!-- VEILLE LEAVES -->
+<div class="leaf c-teal" style="left:1410px;top:245px">Tests : Tableau · Power BI · Python · DBT</div>
+<div class="leaf c-teal" style="left:1410px;top:268px">Méthodes : EDA · ACP · Séries temporelles · ML</div>
+<div class="leaf c-teal" style="left:1410px;top:291px">Sources : OC · Kaggle · TDS · CNIL</div>
+
+<!-- SOFT SKILLS LEAVES -->
+<div class="leaf c-pink" style="left:1410px;top:515px">Rigueur analytique &amp; documentation</div>
+<div class="leaf c-pink" style="left:1410px;top:538px">Communication orale (soutenances)</div>
+<div class="leaf c-pink" style="left:1410px;top:561px">Autonomie · Adaptabilité · Esprit critique</div>
+
+<!-- GESTION LEAVES -->
+<div class="leaf c-amber" style="left:1230px;top:665px">Diagramme de Gantt</div>
+<div class="leaf c-amber" style="left:1230px;top:688px">Cahier des charges fonctionnel</div>
+<div class="leaf c-amber" style="left:1230px;top:711px">Analyse besoins client Aeroworld</div>
+<div class="leaf c-amber" style="left:1400px;top:677px">Procédures de documentation</div>
+<div class="leaf c-amber" style="left:1400px;top:700px">Session formation Power BI/Tableau</div>
+
+<!-- ===================================================================
+     PROJETS — disposition :
+     Colonne 1 (proj)  : left=10,  width=175
+     Colonne 2 (feuil) : left=195  (10+175+10)
+     Colonne 3 (proj)  : left=430  (195+220+15)
+     Colonne 4 (feuil) : left=615  (430+175+10)
+
+     Espacement vertical : 95px par projet
+     P1–P6  col 1+2  (top 20..495)
+     P7–P12 col 3+4  (top 20..495)
+     =================================================================== -->
+
+<!-- COL 1 : P1–P6 -->
+<div class="proj c-blue"   id="p1" style="left:10px;top:20px;width:175px"  onclick="show('P1')"><div class="num">Projet 1</div><div class="ttl">Prise en main formation</div></div>
+<div class="proj c-teal"   id="p2" style="left:10px;top:115px;width:175px" onclick="show('P2')"><div class="num">Projet 2</div><div class="ttl">Ventes e-commerce</div></div>
+<div class="proj c-purple" id="p3" style="left:10px;top:210px;width:175px" onclick="show('P3')"><div class="num">Projet 3</div><div class="ttl">Requêtes SQL</div></div>
+<div class="proj c-amber"  id="p4" style="left:10px;top:305px;width:175px" onclick="show('P4')"><div class="num">Projet 4</div><div class="ttl">Santé publique Python</div></div>
+<div class="proj c-coral"  id="p5" style="left:10px;top:400px;width:175px" onclick="show('P5')"><div class="num">Projet 5</div><div class="ttl">BDD immobilière SQL</div></div>
+<div class="proj c-pink"   id="p6" style="left:10px;top:495px;width:175px" onclick="show('P6')"><div class="num">Projet 6</div><div class="ttl">Données boutique Python</div></div>
+
+<!-- COL 2 : feuilles P1–P6 (left=195) -->
+<a href="https://github.com/michele-data21/formation-data-analyst" target="_blank" class="leaf c-blue" style="left:195px;top:20px">🔗 P1</a>
+<div class="leaf c-pink" style="left:195px;top:38px">Autonomie · Curiosité</div>
+<div class="leaf c-gray" style="left:195px;top:56px">Posture DA · Soft skills</div>
+
+<a href="https://github.com/michele-data21/analyse-ventes-ecommerce" target="_blank" class="leaf c-teal" style="left:195px;top:115px">🔗 P2</a>
+<div class="leaf c-pink" style="left:195px;top:133px">Storytelling · Communication</div>
+<div class="leaf c-gray" style="left:195px;top:151px">Excel · Graphiques · Narration</div>
+
+<a href="https://github.com/michele-data21/sql-database-project" target="_blank" class="leaf c-purple" style="left:195px;top:210px">🔗 P3</a>
+<div class="leaf c-pink" style="left:195px;top:228px">Rigueur · Documentation</div>
+<div class="leaf c-gray" style="left:195px;top:246px">SQL · Schéma BDD · Requêtes</div>
+
+<a href="https://github.com/michele-data21/etude-sante-publique" target="_blank" class="leaf c-amber" style="left:195px;top:305px">🔗 P4</a>
+<div class="leaf c-pink" style="left:195px;top:323px">Esprit analytique · Gestion temps</div>
+<div class="leaf c-gray" style="left:195px;top:341px">Python · Pandas · EDA · Séries</div>
+
+<a href="https://github.com/michele-data21/database-immobiliere-sql" target="_blank" class="leaf c-coral" style="left:195px;top:400px">🔗 P5</a>
+<div class="leaf c-pink" style="left:195px;top:418px">RGPD · Sens du détail</div>
+<div class="leaf c-gray" style="left:195px;top:436px">SQL · RGPD · BDD immo</div>
+
+<a href="https://github.com/michele-data21/optimisation-donnees-boutique" target="_blank" class="leaf c-pink" style="left:195px;top:495px">🔗 P6</a>
+<div class="leaf c-pink" style="left:195px;top:513px">Esprit critique · Pédagogie</div>
+<div class="leaf c-gray" style="left:195px;top:531px">Python · Nettoyage · Heatmap</div>
+
+<!-- COL 3 : P7–P12 (left=430) -->
+<div class="proj c-green"  id="p7"  style="left:430px;top:20px;width:175px"  onclick="show('P7')"><div class="num">Projet 7</div><div class="ttl">Tableau de bord Power BI</div></div>
+<div class="proj c-gray"   id="p8"  style="left:430px;top:115px;width:175px" onclick="show('P8')"><div class="num">Projet 8</div><div class="ttl">Profils sociodémo DBT</div></div>
+<div class="proj c-blue"   id="p9"  style="left:430px;top:210px;width:175px" onclick="show('P9')"><div class="num">Projet 9</div><div class="ttl">Ventes librairie Python</div></div>
+<div class="proj c-teal"   id="p10" style="left:430px;top:305px;width:175px" onclick="show('P10')"><div class="num">Projet 10</div><div class="ttl">Eau potable Power BI</div></div>
+<div class="proj c-purple" id="p11" style="left:430px;top:400px;width:175px" onclick="show('P11')"><div class="num">Projet 11</div><div class="ttl">Étude de marché Python</div></div>
+<div class="proj c-coral"  id="p12" style="left:430px;top:495px;width:175px" onclick="show('P12')"><div class="num">Projet 12</div><div class="ttl">Faux billets Python (ML)</div></div>
+
+<!-- COL 4 : feuilles P7–P12 (left=615) -->
+<a href="https://github.com/michele-data21/dashboard-powerbi" target="_blank" class="leaf c-green" style="left:615px;top:20px">🔗 P7</a>
+<div class="leaf c-pink" style="left:615px;top:38px">UX data · Gestion du temps</div>
+<div class="leaf c-gray" style="left:615px;top:56px">Power BI · DAX · Modèle étoile</div>
+
+<a href="https://github.com/michele-data21/dbt-sociodemographie" target="_blank" class="leaf c-gray" style="left:615px;top:115px">🔗 P8</a>
+<div class="leaf c-pink" style="left:615px;top:133px">Curiosité technologique</div>
+<div class="leaf c-gray" style="left:615px;top:151px">DBT · Airflow · Tests · INSEE</div>
+
+<a href="https://github.com/michele-data21/analyse-librairie" target="_blank" class="leaf c-blue" style="left:615px;top:210px">🔗 P9</a>
+<div class="leaf c-pink" style="left:615px;top:228px">Synthèse · Communication orale</div>
+<div class="leaf c-gray" style="left:615px;top:246px">Python · Séries temporelles · Lorenz</div>
+
+<a href="https://github.com/michele-data21/etude-eau-potable" target="_blank" class="leaf c-teal" style="left:615px;top:305px">🔗 P10</a>
+<div class="leaf c-pink" style="left:615px;top:323px">Design data · Public</div>
+<div class="leaf c-gray" style="left:615px;top:341px">Power BI · Maps · User stories</div>
+
+<a href="https://github.com/michele-data21/etude-marche-ml" target="_blank" class="leaf c-purple" style="left:615px;top:400px">🔗 P11</a>
+<div class="leaf c-pink" style="left:615px;top:418px">Persévérance · Prise de parole</div>
+<div class="leaf c-gray" style="left:615px;top:436px">Python · ACP · Clustering</div>
+
+<a href="https://github.com/michele-data21/detection-faux-billets" target="_blank" class="leaf c-coral" style="left:615px;top:495px">🔗 P12</a>
+<div class="leaf c-pink" style="left:615px;top:513px">Rigueur scientifique · Autonomie</div>
+<div class="leaf c-gray" style="left:615px;top:531px">ML supervisé + non supervisé · K-means</div>
+
+</div><!-- canvas -->
+</div><!-- wrap -->
+
+<div id="detail">
+  <span class="dt-close" onclick="document.getElementById('detail').style.display='none'">×</span>
+  <div class="dt-title" id="dt-title"></div>
+  <div class="dt-body"  id="dt-body"></div>
+</div>
+
+<script>
+const DATA = {
+  P1:{title:"P1 — Prise en main de la formation",body:`<span class="dt-tag tag-v">✓ Posture DA</span><span class="dt-tag tag-v">✓ Cadre formation</span><span class="dt-tag tag-v">✓ Soft skills DA</span><br><br><b>Points forts :</b> Projet complet et bien structuré.<br><b>Axes :</b> Approfondir la veille métier.<br><b>Soft skills :</b> Autonomie · Curiosité · Organisation.`},
+  P2:{title:"P2 — Analyse de ventes e-commerce",body:`<span class="dt-tag tag-v">✓ Graphiques accessibles</span><span class="dt-tag tag-v">✓ Narration</span><br><br><b>Points forts :</b> Baisse du CA expliquée · Projection motivée.<br><b>Axes :</b> Enrichir l'analyse segments clients.<br><b>Soft skills :</b> Storytelling · Communication · Rigueur.`},
+  P3:{title:"P3 — Requêtes SQL",body:`<span class="dt-tag tag-v">✓ Schéma BDD</span><span class="dt-tag tag-v">✓ Scripts SQL</span><br><br><b>Points forts :</b> Travail soigné et documenté.<br><b>Axes :</b> Requêtes avancées (CTE, fenêtres).<br><b>Soft skills :</b> Rigueur · Documentation.`},
+  P4:{title:"P4 — Étude santé publique Python",body:`<span class="dt-tag tag-v">✓ Exploration Python</span><br><br><b>Points forts :</b> Analyse complémentaire · Temporalité 2013-2017.<br><b>Axes :</b> Respecter les délais.<br><b>Soft skills :</b> Esprit analytique · Adaptabilité.`},
+  P5:{title:"P5 — BDD immobilière SQL",body:`<span class="dt-tag tag-v">✓ Création BDD</span><span class="dt-tag tag-v">✓ RGPD</span><br><br><b>Points forts :</b> Livrables conformes · Soutenance fluide.<br><b>Axes :</b> Analyse géospatiale.<br><b>Soft skills :</b> RGPD · Communication.`},
+  P6:{title:"P6 — Gestion données boutique Python",body:`<span class="dt-tag tag-v">✓ Nettoyage RGPD</span><span class="dt-tag tag-v">✓ Analyses multivariées</span><br><br><b>Points forts :</b> 8+ incohérences · Heatmap corrélation.<br><b>Axes :</b> Interpréter les corrélations.<br><b>Soft skills :</b> Rigueur · Pédagogie.`},
+  P7:{title:"P7 — Tableau de bord Power BI",body:`<span class="dt-tag tag-v">✓ Reporting &amp; décision</span><br><br><b>Points forts :</b> DAX · Modèle étoile · 3 rôles · Info-bulle.<br><b>Axes :</b> Améliorer le design visuel.<br><b>Soft skills :</b> UX data · Gestion du temps.`},
+  P8:{title:"P8 — Profils sociodémographiques DBT",body:`<span class="dt-tag tag-v">✓ Agrégation DBT</span><span class="dt-tag tag-v">✓ RGPD</span><br><br><b>Points forts :</b> Airflow · staging→mart · Tests not_null/unique.<br><b>Axes :</b> Documenter les pipelines.<br><b>Soft skills :</b> Rigueur · Curiosité technologique.`},
+  P9:{title:"P9 — Ventes librairie Python",body:`<span class="dt-tag tag-v">✓ Séries temporelles</span><span class="dt-tag tag-v">✓ Tests statistiques</span><br><br><b>Points forts :</b> Courbe de Lorenz · Moyennes mobiles.<br><b>Axes :</b> Explorer ARIMA/Prophet.<br><b>Soft skills :</b> Synthèse · Communication orale.`},
+  P10:{title:"P10 — Étude eau potable Power BI",body:`<span class="dt-tag tag-v">✓ Récit dynamique</span><span class="dt-tag tag-v">✓ Dashboard interactif</span><br><br><b>Points forts :</b> 3 user stories · Maps · KPI pertinents.<br><b>Axes :</b> Enrichir info-bulles · Ajuster maps.<br><b>Soft skills :</b> Design data · Rigueur visuelle.`},
+  P11:{title:"P11 — Étude de marché Python",body:`<span class="dt-tag tag-v">✓ ACP</span><span class="dt-tag tag-v">✓ Clustering</span><br><br><b>Points forts :</b> Jupyter complet · Progression ACP visible.<br><b>Axes :</b> ACP = réduction de dimension (pas filtre).<br><b>Soft skills :</b> Persévérance · Prise de parole.`},
+  P12:{title:"P12 — Détection faux billets Python",body:`<span class="dt-tag tag-v">✓ ML supervisé (RF, KNN, Logit)</span><span class="dt-tag tag-v">✓ K-means</span><br><br><b>Points forts :</b> Script prédiction · F1/AUC · Imputation régression.<br><b>Axes :</b> Harmoniser train/test · Justifier l'imputation.<br><b>Soft skills :</b> Rigueur scientifique · Autonomie.`},
+};
+
+function show(k){
+  document.getElementById('dt-title').textContent=DATA[k].title;
+  document.getElementById('dt-body').innerHTML=DATA[k].body;
+  document.getElementById('detail').style.display='block';
+}
+
+function drawLines(){
+  const svg=document.getElementById('svg-lines');
+  svg.innerHTML='';
+  const map=document.getElementById('map');
+  const mr=map.getBoundingClientRect();
+  function cx(id){
+    const el=document.getElementById(id);
+    if(!el)return null;
+    const r=el.getBoundingClientRect();
+    return{x:r.left-mr.left+r.width/2,y:r.top-mr.top+r.height/2};
+  }
+  const conn=[
+    ['nc','b-profil','#85B7EB',1.5],['nc','b-comp','#AFA9EC',1.5],
+    ['nc','b-veille','#5DCAA5',1.5],['nc','b-soft','#ED93B1',1.5],
+    ['nc','b-gestion','#EF9F27',1.5],['nc','b-projets','#97C459',1.5],
+    ['b-projets','p1','#97C459',0.8],['b-projets','p2','#97C459',0.8],
+    ['b-projets','p3','#97C459',0.8],['b-projets','p4','#97C459',0.8],
+    ['b-projets','p5','#97C459',0.8],['b-projets','p6','#97C459',0.8],
+    ['b-projets','p7','#97C459',0.8],['b-projets','p8','#97C459',0.8],
+    ['b-projets','p9','#97C459',0.8],['b-projets','p10','#97C459',0.8],
+    ['b-projets','p11','#97C459',0.8],['b-projets','p12','#97C459',0.8],
+  ];
+  conn.forEach(([a,b,col,w])=>{
+    const pa=cx(a),pb=cx(b);
+    if(!pa||!pb)return;
+    const mx=(pa.x+pb.x)/2;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M${pa.x},${pa.y} C${mx},${pa.y} ${mx},${pb.y} ${pb.x},${pb.y}`);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke',col);
+    p.setAttribute('stroke-width',w);
+    p.setAttribute('opacity','0.55');
+    svg.appendChild(p);
+  });
+}
+setTimeout(drawLines,200);
+window.addEventListener('resize',()=>setTimeout(drawLines,100));
+</script>
+</body>
+</html>
